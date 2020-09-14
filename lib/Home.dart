@@ -50,6 +50,7 @@ class _HomeState extends State<Home> {
       if (!res.isGranted) {
         PermissionStatus permissionStatus = await Permission.storage.request();
         print(permissionStatus.isGranted);
+        
       }
     } catch (e) {
       print(e);
