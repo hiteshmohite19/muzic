@@ -47,9 +47,10 @@ class _HomeState extends State<Home> {
   Future reqPermission() async {
     try {
       var res = await Permission.storage.status;
-      if (!res.isGranted) {
+      if (!res.isUndetermined) {
         PermissionStatus permissionStatus = await Permission.storage.request();
         print(permissionStatus.isGranted);
+        print(res);
       }
     } catch (e) {
       print(e);
