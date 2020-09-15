@@ -12,6 +12,26 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   ColorsValues cv = ColorsValues();
+  bool status;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    bool res = await permissionStatus();
+    setState(() {
+      status = res;
+    });
+    if (res == true) {
+      print('true');
+    } else {
+      print('false');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,27 +46,23 @@ class _HomeState extends State<Home> {
           backgroundColor: cv.darkRed,
         ),
         body: Container(
-          child: homeWidget(context),
+          child: homeWidget(),
         ));
   }
 
-  Widget listViewWidget(context) {
-    return ListView.builder(itemBuilder: (context, index) {
-      return Card(
-        child: ListTile(
-          onTap: () {},
-          title: Text(''),
-        ),
-      );
-    });
+  Widget homeWidget() {
+    print(status);
+    return Center(
+      child: Text(''),
+    );
   }
+
+
 
   Widget reqPermissionWidget() {
     return Container(
       child: GestureDetector(
-        onTap: () {
-          reqPermission();
-        },
+        onTap: () {},
         child: Container(
             child: Center(
           child: Text('To enable notifications tap here..'),
@@ -55,24 +71,15 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future reqPermission() async {
-    var resp;
 
-    return resp;
-  }
 
-  loadFiles() {
-    Directory dir = Directory('/storage/emulated/0/');
-    String mp3Path = dir.toString();
-    print(mp3Path);
-    List<FileSystemEntity> _files;
-    List<FileSystemEntity> _songs = [];
-    _files = dir.listSync(recursive: true, followLinks: false);
-    for (FileSystemEntity entity in _files) {
-      String path = entity.path;
-      if (path.endsWith('.mp3')) _songs.add(entity);
+  Future<bool> permissionStatus() async {
+    if (await Permission.storage.status.isGranted) {
+      return true;
+    } else {
+      return false;
     }
-    print(_songs);
-    print(_songs.length);
   }
+
+
 }
