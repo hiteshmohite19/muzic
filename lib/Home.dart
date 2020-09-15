@@ -13,12 +13,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   ColorsValues cv = ColorsValues();
   bool storage_access_status = false;
-  var file_name=[];
+  var file_name = [];
 
   @override
   void initState() {
     super.initState();
-    if (reqPermission() == true) {
+    print(reqPermission());
+    if (reqPermission() == 'true') {
       listViewWidget(context);
     } else {
       reqPermission();
@@ -78,6 +79,7 @@ class _HomeState extends State<Home> {
   }
 
   Future reqPermission() async {
+    var resp;
     try {
       var res = await Permission.storage.status;
       PermissionStatus permissionStatus = await Permission.storage.request();
@@ -89,11 +91,15 @@ class _HomeState extends State<Home> {
           storage_access_status = true;
           listViewWidget(context);
         });
+        resp = 'true';
       }
-      return permissionStatus.isGranted;
+      // return permissionStatus.isGranted;
     } catch (e) {
       print(e);
+      resp = 'false';
     }
+
+    return resp;
   }
 
   loadFiles() {
@@ -109,7 +115,7 @@ class _HomeState extends State<Home> {
     }
     print(_songs);
     print(_songs.length);
-    file_name=_songs;
+    file_name = _songs;
     print(file_name.length);
   }
 }
