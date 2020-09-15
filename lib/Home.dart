@@ -12,19 +12,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   ColorsValues cv = ColorsValues();
-  bool storage_access_status = false;
-  var file_name = [];
-
-  @override
-  void initState() {
-    super.initState();
-    print(reqPermission());
-    if (reqPermission() == 'true') {
-      listViewWidget(context);
-    } else {
-      reqPermission();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +31,14 @@ class _HomeState extends State<Home> {
   }
 
   Widget listViewWidget(context) {
-    return ListView.builder(
-        itemCount: file_name.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              onTap: () {},
-              title: Text(file_name[index].File),
-            ),
-          );
-        });
+    return ListView.builder(itemBuilder: (context, index) {
+      return Card(
+        child: ListTile(
+          onTap: () {},
+          title: Text(''),
+        ),
+      );
+    });
   }
 
   Widget reqPermissionWidget() {
@@ -70,34 +55,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget homeWidget(context) {
-    if (storage_access_status == true) {
-      return listViewWidget(context);
-    } else {
-      return reqPermissionWidget();
-    }
-  }
-
   Future reqPermission() async {
     var resp;
-    try {
-      var res = await Permission.storage.status;
-      PermissionStatus permissionStatus = await Permission.storage.request();
-      if (!res.isGranted) {
-        // PermissionStatus permissionStatus = await Permission.storage.request();
-        print('permission ${permissionStatus.isGranted}');
-        // print('res ${res}');
-        setState(() {
-          storage_access_status = true;
-          listViewWidget(context);
-        });
-        resp = 'true';
-      }
-      // return permissionStatus.isGranted;
-    } catch (e) {
-      print(e);
-      resp = 'false';
-    }
 
     return resp;
   }
@@ -115,7 +74,5 @@ class _HomeState extends State<Home> {
     }
     print(_songs);
     print(_songs.length);
-    file_name = _songs;
-    print(file_name.length);
   }
 }
