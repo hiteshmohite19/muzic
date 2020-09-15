@@ -13,10 +13,16 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   ColorsValues cv = ColorsValues();
   bool storage_access_status = false;
+  var file_name=[];
 
   @override
   void initState() {
     super.initState();
+    if (reqPermission() == true) {
+      listViewWidget(context);
+    } else {
+      reqPermission();
+    }
   }
 
   @override
@@ -32,11 +38,22 @@ class _HomeState extends State<Home> {
           backgroundColor: cv.darkRed,
         ),
         body: Container(
-          child: homeWidget(),
+          child: homeWidget(context),
         ));
   }
 
-  Widget listViewWidget() {}
+  Widget listViewWidget(context) {
+    return ListView.builder(
+        itemCount: file_name.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: ListTile(
+              onTap: () {},
+              title: Text(file_name[index].File),
+            ),
+          );
+        });
+  }
 
   Widget reqPermissionWidget() {
     return Container(
@@ -52,9 +69,9 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget homeWidget() {
+  Widget homeWidget(context) {
     if (storage_access_status == true) {
-      return listViewWidget();
+      return listViewWidget(context);
     } else {
       return reqPermissionWidget();
     }
@@ -63,14 +80,17 @@ class _HomeState extends State<Home> {
   Future reqPermission() async {
     try {
       var res = await Permission.storage.status;
+      PermissionStatus permissionStatus = await Permission.storage.request();
       if (!res.isGranted) {
-        PermissionStatus permissionStatus = await Permission.storage.request();
+        // PermissionStatus permissionStatus = await Permission.storage.request();
         print('permission ${permissionStatus.isGranted}');
-        print('res ${res}');
+        // print('res ${res}');
         setState(() {
           storage_access_status = true;
+          listViewWidget(context);
         });
       }
+      return permissionStatus.isGranted;
     } catch (e) {
       print(e);
     }
@@ -87,19 +107,9 @@ class _HomeState extends State<Home> {
       String path = entity.path;
       if (path.endsWith('.mp3')) _songs.add(entity);
     }
-    // print(_songs);
-    // print(_songs.length);
-    return _songs;
+    print(_songs);
+    print(_songs.length);
+    file_name=_songs;
+    print(file_name.length);
   }
 }
-// Container(
-//         child: GestureDetector(
-//           onTap: () {
-//             reqPermission();
-//           },
-//           child: Container(
-//               child: Center(
-//             child: Text('To enable notifications tap here..'),
-//           )),
-//         ),
-//       ),
