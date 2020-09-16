@@ -2,7 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/ColorsValues.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import 'HandlePermission.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -11,30 +14,31 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   ColorsValues cv = ColorsValues();
+  HandlePermission handlePermission = HandlePermission();
   bool status;
+  Widget homeWidget;
 
   @override
   void initState() {
     super.initState();
-    if (status == false) {
-      permissionStatus();
-    }
+    homePage();
   }
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    bool res1 = await reqPermission();
-    bool res = await permissionStatus();
-    if (res1 != null) {
-      res = res1;
+    setState(() async {
+      status = await handlePermission.permissionStatus();
+    });
+    if (status) {
+      setState(() {
+        homeWidget = listPage();
+      });
     }
-    print('status $res');
-    if (res == true) {
-      listPage();
-    }
-    if (res == false) {
-      reqPermissionWidget();
+    if (!status) {
+      setState(() {
+        homeWidget = reqPermissionWidget();
+      });
     }
   }
 
@@ -51,21 +55,15 @@ class _HomeState extends State<Home> {
           backgroundColor: cv.darkRed,
         ),
         body: Container(
-          child: homeWidget(),
+          child: SpinKitFadingCircle(
+            color: cv.darkRed,
+            size: 30,
+          ),
         ));
   }
 
-  Widget homeWidget() {
-    print(status);
-    var widget;
-    if (status == true) {
-      widget = listPage();
-    }
-    if (status == false) {
-      widget = reqPermissionWidget();
-    }
-
-    return widget;
+  Widget homePage() {
+    return homeWidget;
   }
 
   Widget listPage() {
@@ -78,7 +76,9 @@ class _HomeState extends State<Home> {
     return Container(
       child: GestureDetector(
         onTap: () {
-          reqPermission();
+          setState(() async {
+            status = await handlePermission.reqPermission();
+          });
         },
         child: Container(
             child: Center(
@@ -86,27 +86,5 @@ class _HomeState extends State<Home> {
         )),
       ),
     );
-  }
-
-  Future<bool> reqPermission() async {
-    var status = await Permission.storage.isGranted;
-    if (!status) {
-      PermissionStatus permissionStatus = await Permission.storage.request();
-      if (permissionStatus.isGranted) {
-        // print('values ${permissionStatus.isGranted}');
-        listPage();
-        return true;
-      }
-    }
-  }
-
-  Future<bool> permissionStatus() async {
-    if (await Permission.storage.status.isGranted) {
-      listPage();
-      return true;
-    } else {
-      reqPermissionWidget();
-      return false;
-    }
   }
 }

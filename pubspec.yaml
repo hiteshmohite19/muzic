@@ -23,6 +23,7 @@ environment:
 dependencies:
 
   permission_handler:
+  flutter_spinkit:
 
   flutter:
     sdk: flutter
