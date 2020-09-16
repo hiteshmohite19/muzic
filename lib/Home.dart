@@ -31,7 +31,8 @@ class _HomeState extends State<Home> {
     print('status $status');
     if (status == true) {
       listPage();
-    } if(status==false) {
+    }
+    if (status == false) {
       reqPermissionWidget();
     }
   }
@@ -95,6 +96,7 @@ class _HomeState extends State<Home> {
         setState(() {
           status = true;
         });
+        listPage();
         return true;
       }
     }
