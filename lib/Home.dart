@@ -17,18 +17,28 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    if (status == false) {
+      permissionStatus();
+    }
   }
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
+    bool res1 = await reqPermission();
+    print('values $res1');
     bool res = await permissionStatus();
+    print('vales $res');
     setState(() {
       status = res;
     });
-    if (res == true) {
+    print('$res $res1');
+    if (res == true || res1 == true) {
+      
+      listPage();
       print('true');
     } else {
+      reqPermissionWidget();
       print('false');
     }
   }
@@ -52,34 +62,57 @@ class _HomeState extends State<Home> {
 
   Widget homeWidget() {
     print(status);
-    return Center(
-      child: Text(''),
-    );
+    var widget;
+    if (status == true) {
+      widget = listPage();
+    }
+    if (status == false) {
+      widget = reqPermissionWidget();
+    }
+
+    return widget;
   }
 
-
+  Widget listPage() {
+    return Center(
+      child: Text('True'),
+    );
+  }
 
   Widget reqPermissionWidget() {
     return Container(
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+          reqPermission();
+        },
         child: Container(
             child: Center(
-          child: Text('To enable notifications tap here..'),
+          child: Text('Click to allow storage access to load audio files'),
         )),
       ),
     );
   }
 
-
+  Future<bool> reqPermission() async {
+    var status = await Permission.storage.isGranted;
+    if (!status) {
+      PermissionStatus permissionStatus = await Permission.storage.request();
+      if (permissionStatus.isGranted) {
+        print('values ${permissionStatus.isGranted}');
+        setState(() {
+          status = true;
+        });
+        return true;
+      }
+    }
+  }
 
   Future<bool> permissionStatus() async {
     if (await Permission.storage.status.isGranted) {
       return true;
     } else {
+      reqPermissionWidget();
       return false;
     }
   }
-
-
 }
