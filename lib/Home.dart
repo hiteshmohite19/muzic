@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -27,12 +26,14 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
     bool res1 = await reqPermission();
     bool res = await permissionStatus();
-
-    print('status $status');
-    if (status == true) {
+    if (res1 != null) {
+      res = res1;
+    }
+    print('status $res');
+    if (res == true) {
       listPage();
     }
-    if (status == false) {
+    if (res == false) {
       reqPermissionWidget();
     }
   }
@@ -93,9 +94,6 @@ class _HomeState extends State<Home> {
       PermissionStatus permissionStatus = await Permission.storage.request();
       if (permissionStatus.isGranted) {
         // print('values ${permissionStatus.isGranted}');
-        setState(() {
-          status = true;
-        });
         listPage();
         return true;
       }
@@ -104,15 +102,10 @@ class _HomeState extends State<Home> {
 
   Future<bool> permissionStatus() async {
     if (await Permission.storage.status.isGranted) {
-      setState(() {
-        status = true;
-      });
+      listPage();
       return true;
     } else {
       reqPermissionWidget();
-      setState(() {
-        status = false;
-      });
       return false;
     }
   }
