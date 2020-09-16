@@ -26,18 +26,13 @@ class _HomeState extends State<Home> {
   void didChangeDependencies() async {
     super.didChangeDependencies();
     bool res1 = await reqPermission();
-    // print('values $res1');
     bool res = await permissionStatus();
-    // print('vales $res');
 
-    // print('$res $res1');
-    print(status);
+    print('status $status');
     if (status == true) {
       listPage();
-      print('true');
-    } else {
+    } if(status==false) {
       reqPermissionWidget();
-      print('false');
     }
   }
 
@@ -96,7 +91,7 @@ class _HomeState extends State<Home> {
     if (!status) {
       PermissionStatus permissionStatus = await Permission.storage.request();
       if (permissionStatus.isGranted) {
-        print('values ${permissionStatus.isGranted}');
+        // print('values ${permissionStatus.isGranted}');
         setState(() {
           status = true;
         });
