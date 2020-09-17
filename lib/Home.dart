@@ -21,20 +21,26 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    homePage();
+    handlePermission.permissionStatus().then((value) {
+      if (value == false) {
+        handlePermission.reqPermission().then((value) {
+          setState(() {
+            status = value;
+          });
+        });
+      }
+    });
   }
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    var resp = await handlePermission.permissionStatus();
-    setState(() {
-      status = resp;
-      if (status == false) {
-        reqPermissionWidget();
-      }
-      print(status);
-    });
+
+    status = await handlePermission.permissionStatus();
+    print('val $status');
+    if (status == true) {
+      listPage();
+    }
   }
 
   @override
@@ -50,32 +56,22 @@ class _HomeState extends State<Home> {
           backgroundColor: cv.darkRed,
         ),
         body: Container(
-          child: SpinKitFadingCircle(
-            color: cv.darkRed,
-            size: 40,
-          ),
+          child: homePage(),
         ));
   }
 
   Widget homePage() {
-    print(status);
-    // while(status == null) {
-    //   return SpinKitFadingCircle(
-    //     color: cv.darkRed,
-    //     size: 30,
-    //   );
-    // }
-
-    if (status) {
-      print(status);
-      setState(() {
-        homeWidget = listPage();
-      });
-    }
-    if (!status) {
+    var resp = getStatus();
+    print('resp $resp');
+    if (status == false) {
       print(status);
       setState(() {
         homeWidget = reqPermissionWidget();
+      });
+    }
+    if (status) {
+      setState(() {
+        homeWidget = listPage();
       });
     }
 
@@ -100,5 +96,10 @@ class _HomeState extends State<Home> {
         )),
       ),
     );
+  }
+
+  getStatus() async {
+    var resp = await handlePermission.permissionStatus();
+    return resp;
   }
 }

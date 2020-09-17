@@ -5,11 +5,15 @@ class HandlePermission {
     bool status = false;
     status = await Permission.storage.status.isGranted;
     if (!status) {
-      PermissionStatus permissionStatus = await Permission.storage.request();
-      if (permissionStatus.isGranted) {
+      PermissionStatus permission = await Permission.storage.request();
+      if (permission.isGranted) {
+        // status = true;
+        // print('permission ${permissionStatus.isGranted}');
+        permissionStatus();
+        // print('permission ${permissionStatus()}');
         status = true;
       }
-      if (!permissionStatus.isGranted) {
+      if (!permission.isGranted) {
         status = false;
       }
     }
@@ -17,10 +21,12 @@ class HandlePermission {
   }
 
   Future<bool> permissionStatus() async {
+    bool status;
     if (await Permission.storage.status.isGranted) {
-      return true;
+      status = true;
     } else {
-      return false;
+      status = false;
     }
+    return status;
   }
 }
