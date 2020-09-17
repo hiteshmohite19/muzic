@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   ColorsValues cv = ColorsValues();
   HandlePermission handlePermission = HandlePermission();
-  bool status;
+  bool status = false;
   Widget homeWidget;
 
   @override
@@ -27,19 +27,14 @@ class _HomeState extends State<Home> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    setState(() async {
-      status = await handlePermission.permissionStatus();
+    var resp = await handlePermission.permissionStatus();
+    setState(() {
+      status = resp;
+      if (status == false) {
+        reqPermissionWidget();
+      }
+      print(status);
     });
-    if (status) {
-      setState(() {
-        homeWidget = listPage();
-      });
-    }
-    if (!status) {
-      setState(() {
-        homeWidget = reqPermissionWidget();
-      });
-    }
   }
 
   @override
@@ -57,12 +52,33 @@ class _HomeState extends State<Home> {
         body: Container(
           child: SpinKitFadingCircle(
             color: cv.darkRed,
-            size: 30,
+            size: 40,
           ),
         ));
   }
 
   Widget homePage() {
+    print(status);
+    // while(status == null) {
+    //   return SpinKitFadingCircle(
+    //     color: cv.darkRed,
+    //     size: 30,
+    //   );
+    // }
+
+    if (status) {
+      print(status);
+      setState(() {
+        homeWidget = listPage();
+      });
+    }
+    if (!status) {
+      print(status);
+      setState(() {
+        homeWidget = reqPermissionWidget();
+      });
+    }
+
     return homeWidget;
   }
 
@@ -75,10 +91,8 @@ class _HomeState extends State<Home> {
   Widget reqPermissionWidget() {
     return Container(
       child: GestureDetector(
-        onTap: () {
-          setState(() async {
-            status = await handlePermission.reqPermission();
-          });
+        onTap: () async {
+          status = await handlePermission.reqPermission();
         },
         child: Container(
             child: Center(
